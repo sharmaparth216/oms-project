@@ -1,13 +1,9 @@
-# oms-project
-This is a order-management- system with redis queue integrated
-
-<img width="1325" height="863" alt="image" src="https://github.com/user-attachments/assets/f4403596-1210-426e-a05c-f4199b25d0dc" />
-
-
 # Order Management System (OMS)
 
 A simple **Order Management System** built using **FastAPI**, **MongoDB**, **Redis**, **Python Worker**, and **React + Vite**. The system allows you to create orders, track their status, and process them asynchronously via a worker.
 
+
+<img width="1325" height="863" alt="image" src="https://github.com/user-attachments/assets/f4403596-1210-426e-a05c-f4199b25d0dc" />
 ---
 
 ## Features

@@ -1,0 +1,47 @@
+
+
+services:
+  backend:
+    build: ./backend
+    container_name: oms-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - MONGO_URI=mongodb://root:example@mongo:27017
+      - CELERY_BROKER_URL=redis://redis:6379/0
+
+  frontend:
+    build: ./frontend
+    container_name: oms-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+    - CHOKIDAR_USEPOLLING=true  
+
+  worker:
+    build: ./worker
+    container_name: oms-worker
+    depends_on:
+      - redis
+    environment:
+      - MONGO_URI=mongodb://root:example@mongo:27017
+      - CELERY_BROKER_URL=redis://redis:6379/0
+
+  redis:
+    image: redis:alpine
+    container_name: oms-redis
+    ports:
+      - "6379:6379"
+
+  mongo:
+    image: mongo:7.0
+    container_name: oms-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example

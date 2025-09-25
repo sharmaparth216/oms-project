@@ -1,0 +1,66 @@
+# File: .github/workflows/ci-cd.yml
+name: OMS CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    steps:
+    # 1. Checkout repo
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 2. Set up Python for backend
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    # 3. Install backend dependencies
+    - name: Install backend requirements
+      run: |
+        cd backend
+        python -m venv .venv
+        source .venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # 4. Set up Node for frontend
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    # 5. Install frontend dependencies & build
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm install
+        npm run build
+
+    # 6. Build Docker images (optional)
+    - name: Build Docker images
+      run: |
+        docker build -t oms-backend ./backend
+        docker build -t oms-worker ./worker
+        docker build -t oms-frontend ./frontend
